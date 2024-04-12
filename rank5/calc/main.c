@@ -72,6 +72,7 @@ int	prec(char c)
 		return (1);
 	if (c == '*')
 		return (2);
+	return (-1);
 }
 
 void	print_stack(t_stack *stack)
@@ -144,12 +145,26 @@ t_stack *infix_postfix_conv(char *infix)
 		// is operator or perenthesis => to stack
 		if (is_op(infix[i]) || is_paren(infix[i]))
 		{
-			if (!is_paren(infix[i]) && prec(infix[i]) > prec(peak(stack)))
-				add(stack, infix[i]);
-			else if (!is_paren(infix[i])){
+			if (!is_paren(infix[i])){
 				while (stack->sp != 0 && prec(infix[i]) <= prec(peak(stack)))
 					add(postfix, pop(stack));
 				add(stack, infix[i]);
+			}
+			if (is_paren(infix[i])){
+				if (infix[i] == '(')
+					add(stack, infix[i]);
+				else { // )
+					while (1){
+						char c = pop(stack);
+						if (!is_paren(c))
+							add(postfix, c);
+						if (c == '(')
+						{
+							pop(stack);
+							break;
+						}
+					}
+				}
 			}
 
 
@@ -226,6 +241,32 @@ void	char_to_int(t_stack *st)
 	}
 }
 
+int	check_parenthesis(char *str)
+{
+	size_t i;
+	t_stack *st;
+
+	i = 0;
+	st = init_stack(1000);
+	while (str[i])
+	{
+		if (is_paren(str[i]))
+		{
+			if (str[i] == '(')
+				add(st, str[i]);
+			else if (str[i] == ')')
+			{
+				if (st->sp == 0)
+					return (0);
+				pop(st);
+			}
+		}
+		i++;
+	}
+	return (st->sp == 0);
+
+}
+
 int	main(int ac, char **av)
 {
 	t_stack *postfix;
@@ -236,14 +277,15 @@ int	main(int ac, char **av)
 		dprintf(2,"program take 1 argument\n");
 		return (1);
 	}
-	// if (!check_parenthesis(av[1]))
-	// {
-	// }
+	if (!check_parenthesis(av[1]))
+	{
+		dprintf(2, "parenthesis failed\n");
+		return (1);
+	}
 
 	postfix = infix_postfix_conv(av[1]);
 	printf("postfix: ");
 	print_stack(postfix);
-	// char_to_int(postfix);
 
 	printf("calc: %d\n", evaluate_postfix(postfix));
 
