@@ -4,7 +4,7 @@
 
 
 typedef struct s_stack{
-	char *items;
+	int *items;
 	size_t	sp;
 	int size;
 }t_stack;
@@ -81,64 +81,155 @@ void	print_stack(t_stack *stack)
 
 }
 
+int	ft_strlen(char *str)
+{
+	size_t i;
+	int	cnt;
+
+	i = 0;
+	while (str[i])
+		cnt ++;
+	return (cnt);
+}
+
+void reverse(char* str, int len, int i, int temp)
+{
+    // if current index is less than the remaining length of
+    // string
+    if (i < len) {
+        temp = str[i];
+        str[i] = str[len - 1];
+        str[len - 1] = temp;
+        i++;
+        len--;
+        reverse(str, len, i, temp);
+    }
+}
+
+int	is_op(char a)
+{
+	return (a == '+' || a == '*');
+}
+
+int	is_paren(char a)
+{
+	return (a == '(' || a == ')');
+}
+
+int	is_digit(char a)
+{
+	return (a >= '0' && a <= '9');
+}
+
+t_stack *infix_postfix_conv(char *infix)
+{
+	t_stack *postfix;
+	size_t i;
+	t_stack *stack;
+
+	// reverse(infix, ft_strlen(infix), 0, 0);
+	postfix = init_stack(1000);
+	stack = init_stack(1000);
+	i = 0;
+	while (infix[i])
+	{
+		// is operator or perenthesis => to stack
+		if (is_op(infix[i]) || is_paren(infix[i]))
+			add(stack, infix[i]);
+		
+		// is number => to postfix;
+		if (is_digit(infix[i]))
+		{
+			printf("add %c\n", infix[i]);
+			add(postfix, infix[i]);
+		}
+		// // if find couple => clear stack and move to postfix
+		if (in(stack, '(') && in(stack, ')'))
+		{
+			while (1)
+			{
+				char c = pop(stack);
+				if (!is_paren(c))
+					add(postfix, c);
+				if (c == '(')
+					break;
+
+			}
+		}
+		i++;
+		// // end => clear stack and move to postfix
+
+
+	}
+	while (stack->sp != 0)
+	{
+		add(postfix, pop(stack));
+	}
+	// postfix->items[postfix->sp] = 0;
+	return (postfix);
+	
+}
+
+int	evaluate_postfix(t_stack *postfix)
+{
+	t_stack *stack;
+	size_t	i;
+
+	stack = init_stack(1000);
+	i = 0;
+	while (i < postfix->sp)
+	{
+		if (is_digit(postfix->items[i]))
+			add(stack, postfix->items[i] - '0');
+		else
+		{
+			int	val1 = (int)(pop(stack));
+			int	val2 = (int)(pop(stack));
+			if (postfix->items[i] == '+')
+				add(stack, (char)((val2 + val1)));
+			if (postfix->items[i] == '*')
+				add(stack, (char)((val2 * val1)));
+		}
+
+		i++;
+	}
+	return (pop(stack));
+	
+}
+
+void	char_to_int(t_stack *st)
+{
+	size_t i;
+
+	i = 0;
+	while (i < st->sp)
+	{
+		st->items[i] -= '0';
+		i++;
+	}
+}
+
 int	main(int ac, char **av)
 {
-	// char *postfix;
-	t_stack *st;
-
-	st = init_stack(1000);
-
-	add(st, 'A');
-	print_stack(st);
-	printf("peak: %c\n", peak(st));
-	
-	add(st, 'b');
-	print_stack(st);
-	printf("peak: %c\n", peak(st));
-	
-	add(st, 'c');
-	print_stack(st);
-	printf("peak: %c\n", peak(st));
-	
-	add(st, 'd');
-	print_stack(st);
-	printf("peak: %c\n", peak(st));
-	
-	add(st, 'e');
-	print_stack(st);
-	printf("peak: %c\n", peak(st));
+	t_stack *postfix;
 
 
-	printf("pop %c\n", pop(st));
-	print_stack(st);
-	printf("peak: %c\n", peak(st));
-
-	printf("pop %c\n", pop(st));
-	print_stack(st);
-	printf("peak: %c\n", peak(st));
-	
-
-	printf("pop %c\n", pop(st));
-	print_stack(st);
-	printf("peak: %c\n", peak(st));
-	
-	printf("pop %c\n", pop(st));
-	print_stack(st);
-	printf("peak: %c\n", peak(st));
-	
-	printf("pop %c\n", pop(st));
-	print_stack(st);
-	printf("peak: %c\n", peak(st));
-	// if (ac != 2)
-	// {
-	// 	dprintf(stderr,"program take 1 argument\n");
-	// 	return (1);
-	// }
+	if (ac != 2)
+	{
+		dprintf(2,"program take 1 argument\n");
+		return (1);
+	}
 	// if (!check_parenthesis(av[1]))
 	// {
 	// }
 
-	// postfix = infix_postfix_conv(av[1])
+	postfix = infix_postfix_conv(av[1]);
+	printf("postfix: ");
+	print_stack(postfix);
+	// char_to_int(postfix);
+
+	printf("calc: %d\n", evaluate_postfix(postfix));
+
 
 		
 	
