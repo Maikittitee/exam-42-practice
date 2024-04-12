@@ -72,7 +72,7 @@ int	prec(char c)
 		return (1);
 	if (c == '*')
 		return (2);
-	return (-1);
+	return (3);
 }
 
 void	print_stack(t_stack *stack)
@@ -88,31 +88,6 @@ void	print_stack(t_stack *stack)
 	printf("\n");
 
 
-}
-
-int	ft_strlen(char *str)
-{
-	size_t i;
-	int	cnt;
-
-	i = 0;
-	while (str[i])
-		cnt ++;
-	return (cnt);
-}
-
-void reverse(char* str, int len, int i, int temp)
-{
-    // if current index is less than the remaining length of
-    // string
-    if (i < len) {
-        temp = str[i];
-        str[i] = str[len - 1];
-        str[len - 1] = temp;
-        i++;
-        len--;
-        reverse(str, len, i, temp);
-    }
 }
 
 int	is_op(char a)
@@ -136,68 +111,53 @@ t_stack *infix_postfix_conv(char *infix)
 	size_t i;
 	t_stack *stack;
 
-	// reverse(infix, ft_strlen(infix), 0, 0);
 	postfix = init_stack(1000);
 	stack = init_stack(1000);
 	i = 0;
 	while (infix[i])
 	{
-		// is operator or perenthesis => to stack
-		if (is_op(infix[i]) || is_paren(infix[i]))
+		if (is_digit(infix[i]))
+			add(postfix, infix[i]);
+		else if (is_paren(infix[i]))
 		{
-			if (!is_paren(infix[i])){
-				while (stack->sp != 0 && prec(infix[i]) <= prec(peak(stack)))
-					add(postfix, pop(stack));
+			if (infix[i] == ')')
+			{
+				while (stack->sp != 0 && peak(stack) != '(')
+				{
+					char c = pop(stack);
+					printf("pop item is %c\n", c);
+					add(postfix, c);
+				}
+				if (peak(stack) == '(')
+					pop(stack);
+			}
+			else
+				add(stack, infix[i]);
+		}
+		else if (is_op(infix[i]))
+		{
+			if (prec(infix[i]) <= prec(peak(stack)))
+			{
+				while (stack->sp != 0 && peak(stack) != '(' && prec(infix[i]) <= prec(peak(stack)))
+				{
+					char c = pop(stack);
+					if (!is_paren(c))
+						add(postfix, c);
+				}
 				add(stack, infix[i]);
 			}
-			if (is_paren(infix[i])){
-				if (infix[i] == '(')
-					add(stack, infix[i]);
-				else { // )
-					while (1){
-						char c = pop(stack);
-						if (!is_paren(c))
-							add(postfix, c);
-						if (c == '(')
-						{
-							pop(stack);
-							break;
-						}
-					}
-				}
-			}
-
-
-		}
-		// is number => to postfix;
-		if (is_digit(infix[i]))
-		{
-			printf("add %c\n", infix[i]);
-			add(postfix, infix[i]);
-		}
-		// // if find couple => clear stack and move to postfix
-		if (in(stack, '(') && in(stack, ')'))
-		{
-			while (1)
+			else
 			{
-				char c = pop(stack);
-				if (!is_paren(c))
-					add(postfix, c);
-				if (c == '(')
-					break;
-
+				add(stack, infix[i]);
 			}
 		}
 		i++;
-		// // end => clear stack and move to postfix
-
 
 	}
 	while (stack->sp != 0)
 	{
 		add(postfix, pop(stack));
 	}
-	// postfix->items[postfix->sp] = 0;
 	return (postfix);
 	
 }
@@ -227,18 +187,6 @@ int	evaluate_postfix(t_stack *postfix)
 	}
 	return (pop(stack));
 	
-}
-
-void	char_to_int(t_stack *st)
-{
-	size_t i;
-
-	i = 0;
-	while (i < st->sp)
-	{
-		st->items[i] -= '0';
-		i++;
-	}
 }
 
 int	check_parenthesis(char *str)
@@ -288,9 +236,5 @@ int	main(int ac, char **av)
 	print_stack(postfix);
 
 	printf("calc: %d\n", evaluate_postfix(postfix));
-
-
-		
-	
 }
 
