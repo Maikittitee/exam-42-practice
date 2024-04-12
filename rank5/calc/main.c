@@ -66,6 +66,14 @@ int	in(t_stack *stack, char q)
 	return (0);
 }
 
+int	prec(char c)
+{
+	if (c == '+')
+		return (1);
+	if (c == '*')
+		return (2);
+}
+
 void	print_stack(t_stack *stack)
 {
 	size_t i;
@@ -135,8 +143,17 @@ t_stack *infix_postfix_conv(char *infix)
 	{
 		// is operator or perenthesis => to stack
 		if (is_op(infix[i]) || is_paren(infix[i]))
-			add(stack, infix[i]);
-		
+		{
+			if (!is_paren(infix[i]) && prec(infix[i]) > prec(peak(stack)))
+				add(stack, infix[i]);
+			else if (!is_paren(infix[i])){
+				while (stack->sp != 0 && prec(infix[i]) <= prec(peak(stack)))
+					add(postfix, pop(stack));
+				add(stack, infix[i]);
+			}
+
+
+		}
 		// is number => to postfix;
 		if (is_digit(infix[i]))
 		{
