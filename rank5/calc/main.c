@@ -21,15 +21,15 @@ t_stack *init_stack(int size)
 	return (st);
 }
 
-void	add(t_stack *stack, char new)
+void	add(t_stack *stack, int new)
 {
 	stack->items[stack->sp] = new;
 	stack->sp += 1;
 }
 
-char	pop(t_stack *stack)
+int	pop(t_stack *stack)
 {
-	char ret;
+	int ret;
 
 	if (stack->sp == 0)
 		return (0);
@@ -75,6 +75,11 @@ int	prec(char c)
 	return (3);
 }
 
+int	is_op(char a)
+{
+	return (a == '+' || a == '*');
+}
+
 void	print_stack(t_stack *stack)
 {
 	size_t i;
@@ -86,14 +91,24 @@ void	print_stack(t_stack *stack)
 		i++;
 	}
 	printf("\n");
-
-
 }
 
-int	is_op(char a)
+void	print_stack_int(t_stack *stack)
 {
-	return (a == '+' || a == '*');
+	size_t i;
+
+	i = 0;
+	while (i < stack->sp)
+	{
+		if (is_op(stack->items[i]))
+			printf("%c ",stack->items[i]);
+		else
+			printf("%d ", stack->items[i]);
+		i++;
+	}
+	printf("\n");
 }
+
 
 int	is_paren(char a)
 {
@@ -125,7 +140,6 @@ t_stack *infix_postfix_conv(char *infix)
 				while (stack->sp != 0 && peak(stack) != '(')
 				{
 					char c = pop(stack);
-					printf("pop item is %c\n", c);
 					add(postfix, c);
 				}
 				if (peak(stack) == '(')
@@ -171,21 +185,20 @@ int	evaluate_postfix(t_stack *postfix)
 	i = 0;
 	while (i < postfix->sp)
 	{
-		if (is_digit(postfix->items[i]))
-			add(stack, postfix->items[i] - '0');
-		else
-		{
+		if (is_op(postfix->items[i])){
 			int	val1 = (int)(pop(stack));
 			int	val2 = (int)(pop(stack));
 			if (postfix->items[i] == '+')
-				add(stack, (char)((val2 + val1)));
+				add(stack, val2 + val1);
 			if (postfix->items[i] == '*')
-				add(stack, (char)((val2 * val1)));
+				add(stack, val2 * val1);
+			print_stack_int(stack);
 		}
-
+		else
+			add(stack, postfix->items[i]);
 		i++;
 	}
-	return (pop(stack));
+	return (pop(a));
 	
 }
 
@@ -215,6 +228,19 @@ int	check_parenthesis(char *str)
 
 }
 
+void	map_int(t_stack *stack)
+{
+	size_t i;
+
+	i = 0;
+	while (i < stack->sp)
+	{
+		if (is_digit(stack->items[i]))
+			stack->items[i] = stack->items[i] - '0';
+		i++;
+	}
+}
+
 int	main(int ac, char **av)
 {
 	t_stack *postfix;
@@ -234,6 +260,7 @@ int	main(int ac, char **av)
 	postfix = infix_postfix_conv(av[1]);
 	printf("postfix: ");
 	print_stack(postfix);
+	map_int(postfix);
 
 	printf("calc: %d\n", evaluate_postfix(postfix));
 }
