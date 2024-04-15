@@ -41,17 +41,33 @@ void	nchar(char a, int n)
 }
 
 void	print_pair(struct pair data, int indent);
+void	print_map(struct pair *data, int size, int indent);
 
 void	print_json(struct json data, int indent)
 {
 	nchar('\t', indent);
 	if (data.type == STRING)
-		printf("\"%s\"", data.string);
+		printf("\"%s\"\n", data.string);
 	if (data.type == INTEGER)
-		printf("#%d", data.integer);
+		printf("#%d\n", data.integer);
 	if (data.type == MAP)
 	{
-		print_pair(*data.map.data, indent + 1);
+		printf("\n");
+		// print_pair(*data.map.data, indent + 1);
+		print_map(data.map.data, data.map.size ,indent + 1);
+	}
+
+}
+
+void	print_map(struct pair *data, int size, int indent)
+{
+	int	i;
+
+	i = 0;
+	while (i < size)
+	{
+		print_pair(data[i], indent);
+		i++;
 	}
 
 }
@@ -71,14 +87,22 @@ int	main(void)
 	struct pair p;
 
 	struct pair p2;
+	struct pair p3;
 
-	p2.key = "inside";
+	p2.key = "subkey1";
 	p2.value.type = STRING;
-	p2.value.string = "yed mae";
+	p2.value.string = "subvalue1";
+	
+	p3.key = "subkey2";
+	p3.value.type = INTEGER;
+	p3.value.integer = 65;
 
 	p.key = "hello";
 	p.value.type = MAP;
-	p.value.map.data = &p2;
+	p.value.map.size = 2;
+	p.value.map.data = malloc(sizeof(struct pair) * 2);
+	p.value.map.data[0] = p2;
+	p.value.map.data[1] = p3;
 
 
 	print_pair(p, 0);
