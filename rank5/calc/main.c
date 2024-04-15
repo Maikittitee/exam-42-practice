@@ -49,23 +49,6 @@ char	peak(t_stack *stack)
 	return (stack->items[stack->sp - 1]);
 }
 
-// in?
-int	in(t_stack *stack, char q)
-{
-	size_t i;
-
-	i = 0;
-	while (i < stack->sp)
-	{
-		if (stack->items[i] == q)
-		{
-			return (1);
-		}
-		i++;
-	}
-	return (0);
-}
-
 int	prec(char c)
 {
 	if (c == '+')
