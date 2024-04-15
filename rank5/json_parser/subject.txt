@@ -1,0 +1,45 @@
+#include <stdlib.h>
+#include <stdio.h>
+
+struct json
+{
+    enum
+    {
+        STRING,
+        INTEGER,
+        MAP,
+    } type;
+
+    union
+    {
+        struct
+        {
+            struct pair *data;
+            size_t size;
+        } map;
+        char *string;
+        int integer;
+    };
+};
+
+struct pair
+{
+    char *key;
+    struct json value;
+};
+
+// map string to this structure read from stream
+
+echo "{\"key\": 1}" | ./argp /dev/stdin | cat -e
+
+// Handling Part -> Only Number, String, MAP
+
+number = following by scanf(%d) about basic int
+string = handle escaping only '\' and '?'
+MAP = following by JSON Grammar
+
+!! Not to handle spcace in string !!
+
+// Paser Part -> Following by RFC-8259 on JSON Grammar
+
+ALLOW FUNCTION -> getc, ugetc, printf, malloc, calloc, realloc, free, isdigit, fscanf, write
