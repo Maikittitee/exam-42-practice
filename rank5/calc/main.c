@@ -192,13 +192,13 @@ int	evaluate_postfix(t_stack *postfix)
 				add(stack, val2 + val1);
 			if (postfix->items[i] == '*')
 				add(stack, val2 * val1);
-			print_stack_int(stack);
+			// print_stack_int(stack);
 		}
 		else
 			add(stack, postfix->items[i]);
 		i++;
 	}
-	return (pop(a));
+	return (pop(stack));
 	
 }
 

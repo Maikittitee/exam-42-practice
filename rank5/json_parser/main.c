@@ -31,7 +31,8 @@ struct pair
 
 void	print_json(struct json data)
 {
-	
+
+
 }
 
 void	print_pair(struct pair data)
@@ -40,7 +41,5 @@ void	print_pair(struct pair data)
 	printf("key: %s\n", data.key);
 
 	// json value
-	if (data.type == STRING){
-		printf("str: %s\n", data.string )
-	}
+	print_json(data.value);
 }
