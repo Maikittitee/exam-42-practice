@@ -82,6 +82,12 @@ void	print_pair(struct pair data, int indent)
 	print_json(data.value, indent);
 }
 
+struct pair create_json(char *arg)
+{
+	
+}
+
+
 int	main(void)
 {
 	struct pair p;
