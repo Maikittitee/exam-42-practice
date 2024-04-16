@@ -141,12 +141,8 @@ t_stack *infix_postfix_conv(char *infix)
 					if (!is_paren(c))
 						add(postfix, c);
 				}
-				add(stack, infix[i]);
 			}
-			else
-			{
-				add(stack, infix[i]);
-			}
+			add(stack, infix[i]);
 		}
 		i++;
 
